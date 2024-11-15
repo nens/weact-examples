@@ -6,7 +6,7 @@ start = datetime.fromisoformat("2024-01-01T01:00:00+00:00")
 
 end = datetime.now()
 
-base_url = 'http://localhost:8002/api/'
+base_url = 'http://kghub.caiag.kg/api/'
 bearer_token = 'testing'
 organisation_name = 'testing_kizje'
 
@@ -21,7 +21,7 @@ def get_organisation_uuid(organisation_name):
     orgs_uuid = orgs['uuid'][0]
     return orgs_uuid
 
-def get_locations_list(base_url, organisation_uuid):
+def get_locations_list(organisation_uuid):
     # Measuringstations
     location_url = base_url+ "locations/"
 
@@ -55,7 +55,7 @@ def get_observation_list(base_url):
     return observations
 
 
-def get_timeseries_list(base_url, organisation_uuid):
+def get_timeseries_list(organisation_uuid):
     ts_url = base_url + "timeseries/"
     params = {
         "organisation__uuid": organisation_uuid,
@@ -66,7 +66,7 @@ def get_timeseries_list(base_url, organisation_uuid):
     return timeseries
 
 
-def get_timeseries_events(base_url, ts_uuid,start, end ):
+def get_timeseries_events(ts_uuid, start, end):
     ts_url  = base_url + "timeseries/" + ts_uuid + "/events/"
     params = {
         "start": start,
@@ -79,9 +79,9 @@ def get_timeseries_events(base_url, ts_uuid,start, end ):
     return time_series_events
 
 
-obs = get_observation_list(base_url)
-org_uuid = get_organisation_uuid(organisation_name)
-locations = get_locations_list(base_url, org_uuid)
-timeseries = get_timeseries_list(base_url,org_uuid )
-ts_uuid = timeseries['uuid'][0]
-ts_events = get_timeseries_events(base_url, ts_uuid, start, end)
+#obs = get_observation_list(base_url)
+#org_uuid = get_organisation_uuid(organisation_name)
+#locations = get_locations_list(base_url, org_uuid)
+#timeseries = get_timeseries_list(base_url,org_uuid )
+#ts_uuid = timeseries['uuid'][0]
+#ts_events = get_timeseries_events(base_url, ts_uuid, start, end)
