@@ -6,7 +6,7 @@ start = datetime.fromisoformat("2024-01-01T01:00:00+00:00")
 
 end = datetime.now()
 
-base_url = 'http://kghub.caiag.kg/api/'
+base_url = 'https://kghub.caiag.kg/api/'
 bearer_token = 'testing'
 organisation_name = 'testing_kizje'
 

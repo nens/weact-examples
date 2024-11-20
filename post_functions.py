@@ -1,7 +1,7 @@
 import requests
 import json
 from get_functions import *
-base_url =  'http://kghub.caiag.kg/api/'
+base_url =  'https://kghub.caiag.kg/api/'
 org_uuid = "421f9617-3714-4700-b063-6c4c6d6889be"
 
 bearer_token = 'testing'
