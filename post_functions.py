@@ -1,7 +1,9 @@
 import requests
 import json
+import numpy as np
+import pandas as pd
 from get_functions import *
-base_url =  'https://kghub.caiag.kg/api/'
+base_url =  "https://kghub.caiag.kg/api/"
 org_uuid = "421f9617-3714-4700-b063-6c4c6d6889be"
 
 bearer_token = 'testing'
@@ -44,12 +46,6 @@ def create_location( organisation_uuid, location_name, location_code, coordinate
     # Return JSON response
     return response.json()
 
-
-post = create_location("421f9617-3714-4700-b063-6c4c6d6889be",
-                       'bishkek precipitation', "bishkek_precip",
-                       (74.590958, 42.871773, 0.0))
-
-
 def create_timeseries(name, code, location_uuid, observation_code, base_url, json_headers):
     """
     Function to create a timeseries entry.
@@ -86,5 +82,58 @@ def create_timeseries(name, code, location_uuid, observation_code, base_url, jso
 
     return response.json()
 
-loc_uuid = get_locations_single(base_url,org_uuid,'bishkek_precip' )['uuid'][0]
-ts = create_timeseries('precipitation data gpm','precip_gpm', loc_uuid, 1 , base_url, json_headers)
+
+
+def create_events(timeseries_uuid, datafile, base_url, json_headers):
+    """
+    Function to create events in an existing timeseries
+
+    Args:
+        timeseries_uuid (str): Uuid of the timeseries
+        datafile (str): Path to a csv file with the data. This file should have 2 columns
+            1. datetime: datetimestrings in ISO8601 format
+            2. value: values of the matching timeseries
+        base_url (str): URL endpoint for the DWH API
+        json_headers (dict): Headers to include with the request (e.g., authentication and content type).
+
+    Returns:
+        dict: JSON response from the API.
+    """
+    
+    url = f"{base_url}timeseries/{timeseries_uuid}/events/"
+    print(url)
+
+    df = pd.read_csv(datafile)
+
+    data = []
+    for index, row in df.iterrows():
+        data.append(
+            {
+                "time": row["datetime"],
+                "value": row["value"]
+            }
+        )
+    i = 0
+
+    chunks = np.ceil(len(data)/1000)
+
+    for chunk in np.array_split(data, chunks):
+        i+=1
+        print(f"Posting chunk {i}") 
+        r = requests.post(url=url, data=json.dumps(chunk.tolist()), headers=json_headers)
+        try:
+            r.raise_for_status()
+            print(f"Chunk {i} posted")
+        except:
+            print(f"Chunk {i} post failed")
+            print(r.json())
+            raise
+
+    return r.json()
+
+if __name__ == "__main__()":
+    post = create_location("421f9617-3714-4700-b063-6c4c6d6889be",
+                        'bishkek precipitation', "bishkek_precip",
+                        (74.590958, 42.871773, 0.0))
+    loc_uuid = get_locations_single(base_url,org_uuid,'bishkek_precip' )['uuid'][0]
+    ts = create_timeseries('precipitation data gpm','precip_gpm', loc_uuid, 1 , base_url, json_headers)
